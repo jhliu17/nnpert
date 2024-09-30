@@ -1,0 +1,53 @@
+DATETIME=$(date +%Y%m%d_%H%M%S)
+OUTPUT_FOLDER=outputs/experiment_aurora/train/brain/cross_mapping_$DATETIME
+
+export WANDB_API_KEY=062f6f4523d3b13835ab0f0e45f6bbb89d038e9f
+python train.py \
+    --model.atac-model.input-dim 127219 \
+    --model.atac-model.chromosome-dims 11348 6169 6997 6364 3554 4233 4076 4178 4966 3189 3807 10272 3469 1478 2488 8367 6290 7655 7203 6950 6250 5547 2245 124 \
+    --model.atac-model.hidden-dims 16 32\
+    --model.atac-model.latent-dim 20 \
+    --model.rna-model.input-dim 3000 \
+    --model.rna-model.hidden-dims 640 320 \
+    --model.rna-model.latent-dim 20 \
+    --model.atac2rna-model.input-dim 20 \
+    --model.atac2rna-model.latent-dim 128 \
+    --model.atac2rna-model.affine-num 9 \
+    --model.rna2atac-model.input-dim 20 \
+    --model.rna2atac-model.latent-dim 128 \
+    --model.rna2atac-model.affine-num 9 \
+    --model.atac-discriminator.input-dim 20 \
+    --model.atac-discriminator.affine-num 9 \
+    --model.rna-discriminator.input-dim 20 \
+    --model.rna-discriminator.affine-num 9 \
+    --trainer.dataset-name brain \
+    --trainer.output-folder $OUTPUT_FOLDER \
+    --trainer.atac-seq-path datasets/aurora/brain/train_atac.npz \
+    --trainer.atac-seq-label-path datasets/aurora/brain/atac_gene_activity_labels.txt \
+    --trainer.rna-seq-path datasets/aurora/brain/train_rna.npz \
+    --trainer.rna-seq-label-path datasets/aurora/brain/labels.txt \
+    --trainer.train-atac-ae-lr 1e-3 \
+    --trainer.train-rna-ae-lr 5e-4 \
+    --trainer.train-ae-lr 5e-4 \
+    --trainer.train-aff-lr 5e-4 \
+    --trainer.train-gen-lr 5e-4 \
+    --trainer.train-dis-lr 1e-4 \
+    --trainer.train-batch-size 128 \
+    --trainer.train-atac-ae-num-steps 36000 \
+    --trainer.train-rna-ae-num-steps 9000 \
+    --trainer.train-affine-num-steps 36000 \
+    --trainer.save-and-sample-every 3000 \
+    --trainer.update-dis-freq 5 \
+    --trainer.lamda1 1 \
+    --trainer.lamda2 5 \
+    --trainer.lamda3 0.5 \
+    --trainer.lamda4 0.5 \
+    --trainer.focal-gamma 2 \
+    --trainer.num-workers 4 \
+    --slurm.mode slurm \
+    --slurm.slurm-output-folder $OUTPUT_FOLDER/slurm \
+    --slurm.cpus-per-task 12 \
+    --slurm.node_list YOUR_NODE \
+    --wandb.project aurora \
+    --wandb.name train_cross_mapping_$DATETIME \
+    --wandb.notes ""
